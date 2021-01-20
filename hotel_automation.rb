@@ -1,4 +1,4 @@
-class Hotel
+class HotelAutomation
 
   def initialize(floors, main_corridors, sub_corridors)
     @floors = floors
@@ -112,10 +112,10 @@ puts "Enter Main corridors per floors:"
 main_corridors = STDIN.gets.chomp.to_i
 puts "Enter Sub corridors per floors:"
 sub_corridors = STDIN.gets.chomp.to_i
-hotel = Hotel.new(floors, main_corridors, sub_corridors)
+hotel_automation = HotelAutomation.new(floors, main_corridors, sub_corridors)
 
 #Set the default stats of hotel floors.
-hotel.default_state
+hotel_automation.default_state
 
 puts "Any movement in corridor press 1 else 0" 
-hotel.movement_in_corridor(STDIN.gets.chomp.to_i)
+hotel_automation.movement_in_corridor(STDIN.gets.chomp.to_i)
