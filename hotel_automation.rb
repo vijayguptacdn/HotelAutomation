@@ -31,12 +31,10 @@ class HotelAutomation
       corridor_hash= {}
       corridor_hash["#{corridor}"] = {
         "light": {
-          "count": 1,
           "consume": 5,
           "status": light_status
         },
         "AC": {
-          "count": 1,
           "consume": 10,
           "status": "ON"
         }
@@ -87,24 +85,28 @@ class HotelAutomation
 
 
   def update_floor_status(floor, sub_corr)
-    puts "Total power consume on floor#{floor} is #{@total_power_consume_per_floor} units"
-    @hotel["floor#{floor}"]['sub_corridors'].each do |sub_corridor|
-      sub_corridor["#{sub_corr}"][:light][:status] = "ON" unless sub_corridor["#{sub_corr}"].nil?
-    end
-    
-    sub_light_on, sub_ac_on = 0, 0
-    @hotel["floor#{floor}"]['sub_corridors'].each_with_index do |sub_corridor, index|
-      sub_light_on += 1 if sub_corridor["#{index.to_i+1}"][:light][:status] == "ON"
-      sub_ac_on += 1 if sub_corridor["#{index.to_i+1}"][:AC][:status] == "ON"
-    end
-    
-    floor_power_consume = (@main_corridors*5) + (@main_corridors *10) + (sub_light_on*5) + (sub_ac_on*10)
-    if floor_power_consume > @total_power_consume_per_floor
-      @hotel["floor#{floor}"]['sub_corridors'].each_with_index do |sub_corridor, index|
-        sub_corridor["#{index.to_i+1}"][:AC][:status] = "OFF" if  sub_corridor["#{index.to_i+1}"][:light][:status] == "OFF"
+    unless @hotel["floor#{floor}"].nil? || @hotel["floor#{floor}"]['sub_corridors'].nil?
+      puts "Total power consume on floor#{floor} is #{@total_power_consume_per_floor} units"
+      @hotel["floor#{floor}"] && @hotel["floor#{floor}"]['sub_corridors'].each do |sub_corridor|
+        sub_corridor["#{sub_corr}"][:light][:status] = "ON" unless sub_corridor["#{sub_corr}"].nil?
       end
+      
+      sub_light_on, sub_ac_on = 0, 0
+      @hotel["floor#{floor}"] && @hotel["floor#{floor}"]['sub_corridors'].each_with_index do |sub_corridor, index|
+        sub_light_on += 1 if sub_corridor["#{index.to_i+1}"][:light][:status] == "ON"
+        sub_ac_on += 1 if sub_corridor["#{index.to_i+1}"][:AC][:status] == "ON"
+      end
+      
+      floor_power_consume = (@main_corridors*5) + (@main_corridors *10) + (sub_light_on*5) + (sub_ac_on*10)
+      if floor_power_consume > @total_power_consume_per_floor
+        @hotel["floor#{floor}"] && @hotel["floor#{floor}"]['sub_corridors'].each_with_index do |sub_corridor, index|
+          sub_corridor["#{index.to_i+1}"][:AC][:status] = "OFF" if  sub_corridor["#{index.to_i+1}"][:light][:status] == "OFF"
+        end
+      end
+      hotel_status
+    else
+      puts "You have entered wrong values for floor or sub corridors"
     end
-    hotel_status
   end
 end
 
