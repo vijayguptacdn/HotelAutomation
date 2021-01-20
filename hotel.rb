@@ -1,136 +1,121 @@
 class Hotel
 
-  def default_state(floors, main_cooridoors, sub_cooridoors)
-  	@floors = floors
-  	@main_cooridoors = main_cooridoors
-  	@sub_cooridoors = sub_cooridoors
-  	@hotel = {}
-  	(1..floors).each do |floor|
-  		@hotel["floor#{floor}"] = set_cooridoors(main_cooridoors, sub_cooridoors)
-  	end
-  	@total_power_consume = (@main_cooridoors *15)+(@sub_cooridoors *10)
-  	#puts @hotel
-  	defalut_hotel_state
-  	
+  def initialize(floors, main_corridors, sub_corridors)
+    @floors = floors
+    @main_corridors = main_corridors
+    @sub_corridors = sub_corridors
+    @total_power_consume = (main_corridors *15)+(sub_corridors *10)
   end
 
-  def defalut_hotel_state
-  	@hotel.each do |floor, cooridoor|
-  		puts floor
-  		cooridoor['main_cooridoors'].each do |main_cori|
-  			main_cori.each do |key ,value|
-  				puts "Main cooridoors: #{key}, Light #{key}: #{value[:light][:status]}, AC: #{value[:AC][:status]}"
-  			end
-  		end
-  		cooridoor['sub_cooridoors'].each do |sub_cori|
-  			sub_cori.each do |key, value|
-  				puts "Sub cooridoors: #{key}, Light #{key}: #{value[:light][:status]}, AC: #{value[:AC][:status]}"
-  			end
-  		end
-  	end
+  def default_state
+    @hotel = {}
+    (1..@floors).each do |floor|
+      @hotel["floor#{floor}"] = set_corridors(@main_corridors, @sub_corridors)
+    end
+    hotel_status
   end
 
-  def set_cooridoors(main_cooridoors, sub_cooridoors)
-  	mc_sc_hash, mc_array, sc_array = {}, [], []
-  	(1..main_cooridoors).each do |mc|
-  		mc_hash= {}
-			mc_hash["#{mc}"] = {
-				"light": {
-					"count": 1,
-					"consume": 5,
-					"status": "ON"
-				},
-				"AC": {
-					"count": 1,
-					"consume": 10,
-					"status": "ON"
-				}
-			}
-			mc_array << mc_hash
-		 	mc_sc_hash['main_cooridoors'] = mc_array
-		end
-
-		(1..sub_cooridoors).each do |sc|
-			sc_hash = {}
-			sc_hash["#{sc}"] = {
-				"light": {
-					"count": 1,
-					"consume": 5,
-					"status": "OFF"
-				},
-				"AC": {
-					"count": 1,
-					"consume": 10,
-					"status": "ON"
-				}
-			}
-			sc_array <<  sc_hash 
-			mc_sc_hash['sub_cooridoors'] = sc_array
-		end
-	  mc_sc_hash
+  def set_corridors(main_corridors, sub_corridors)
+    mc_sc_hash = {}
+    mc_sc_hash['main_corridors'] = corridor_dataset(main_corridors)
+    mc_sc_hash['sub_corridors'] = corridor_dataset(sub_corridors, "OFF")
+    mc_sc_hash
   end
 
+  def corridor_dataset(corridors, light_status='ON')
+    corridor_array = []
+    (1..corridors).each do |corridor|
+      corridor_hash= {}
+      corridor_hash["#{corridor}"] = {
+        "light": {
+          "count": 1,
+          "consume": 5,
+          "status": light_status
+        },
+        "AC": {
+          "count": 1,
+          "consume": 10,
+          "status": "ON"
+        }
+      }
+      corridor_array << corridor_hash
+    end  
+    corridor_array
+  end
 
-  def movement_in_cooridoor(any_movement)
-  	if any_movement == 1
-  		default_state(@floors, @main_cooridoors, @sub_cooridoors)
-  		puts "Moment on floor"
-  		floor = STDIN.gets.chomp.to_i 
-  		puts "Moment on sub cooridoor"
-  		sub_coor = STDIN.gets.chomp.to_i
+  def hotel_status
+    @hotel.each do |floor, corridor|
+      puts floor
+      corridor_status(corridor['main_corridors'], 'Main corridors')
+      corridor_status(corridor['sub_corridors'], 'Sub corridors')
+    end
+  end
 
-  	  update_floor_status(floor, sub_coor)
+  def corridor_status(corridor, corridor_name)
+    corridor.each do |corri|
+      corri.each do |key ,value|
+        puts "#{corridor_name}: #{key}, Light #{key}: #{value[:light][:status]}, AC: #{value[:AC][:status]}"
+      end
+    end
+  end
+
+  def movement_in_corridor(any_movement)
+    if any_movement == 1
+      default_state
+      puts "Movement on floor"
+      floor = STDIN.gets.chomp.to_i 
+      puts "Movement on sub corridor"
+      sub_corr = STDIN.gets.chomp.to_i
+
+      update_floor_status(floor, sub_corr)
       t1 = Time.now 
-  		puts "Enter 1 to continue or for exit enter 0"
-	  	moment_value = STDIN.gets.chomp.to_i
-  		if Time.now >= t1 + 10
-  			puts "Time out"
-  			default_state(@floors, @main_cooridoors, @sub_cooridoors)
-  		else 
-	  		movement_in_cooridoor(moment_value)
-  		end 
-  	else
-  		default_state(@floors, @main_cooridoors, @sub_cooridoors)
-  	end
+      puts "Enter 1 to continue or for exit enter 0"
+      movement_value = STDIN.gets.chomp.to_i
+      if Time.now >= t1 + 60
+        puts "No movement happen in sub corridors for more than 1 minute."
+        default_state
+      else 
+        movement_in_corridor(movement_value)
+      end 
+    else
+      default_state
+    end
   end
 
 
-  def update_floor_status(floor, sub_coor)
-  	puts "Total power consume #{@total_power_consume} units"
-
-    @hotel["floor#{floor}"]['sub_cooridoors'].each do |sub_cooridoor|
-    	sub_cooridoor["#{sub_coor}"][:light][:status] = "ON" unless sub_cooridoor["#{sub_coor}"].nil?
+  def update_floor_status(floor, sub_corr)
+    puts "Total power consume #{@total_power_consume} units"
+    @hotel["floor#{floor}"]['sub_corridors'].each do |sub_corridor|
+      sub_corridor["#{sub_corr}"][:light][:status] = "ON" unless sub_corridor["#{sub_corr}"].nil?
     end
     
     sub_light_on, sub_ac_on = 0, 0
-    @hotel["floor#{floor}"]['sub_cooridoors'].each_with_index do |sub_cooridoor, index|
-    	sub_light_on += 1 if sub_cooridoor["#{index.to_i+1}"][:light][:status] == "ON"
-    	sub_ac_on += 1 if sub_cooridoor["#{index.to_i+1}"][:AC][:status] == "ON"
+    @hotel["floor#{floor}"]['sub_corridors'].each_with_index do |sub_corridor, index|
+      sub_light_on += 1 if sub_corridor["#{index.to_i+1}"][:light][:status] == "ON"
+      sub_ac_on += 1 if sub_corridor["#{index.to_i+1}"][:AC][:status] == "ON"
     end
     
-    floor_power_consume = (@main_cooridoors*5) + (@main_cooridoors *10) + (sub_light_on*5) + (sub_ac_on*10)
+    floor_power_consume = (@main_corridors*5) + (@main_corridors *10) + (sub_light_on*5) + (sub_ac_on*10)
     if floor_power_consume > @total_power_consume
-    	@hotel["floor#{floor}"]['sub_cooridoors'].each_with_index do |sub_cooridoor, index|
-    		sub_cooridoor["#{index.to_i+1}"][:AC][:status] = "OFF" if  sub_cooridoor["#{index.to_i+1}"][:light][:status] == "OFF"
-    	end
+      @hotel["floor#{floor}"]['sub_corridors'].each_with_index do |sub_corridor, index|
+        sub_corridor["#{index.to_i+1}"][:AC][:status] = "OFF" if  sub_corridor["#{index.to_i+1}"][:light][:status] == "OFF"
+      end
     end
-    defalut_hotel_state
+    hotel_status
   end
 end
 
 
-hotel = Hotel.new
-puts "Enter number of Floors"
+puts "Enter number of Floors:"
 floors = STDIN.gets.chomp.to_i
-puts "Enter number of Main cooridoors"
-main_cooridoors = STDIN.gets.chomp.to_i
-puts "Enter number of Sub cooridoors"
-sub_cooridoors = STDIN.gets.chomp.to_i
+puts "Enter Main corridors per floors:"
+main_corridors = STDIN.gets.chomp.to_i
+puts "Enter Sub corridors per floors:"
+sub_corridors = STDIN.gets.chomp.to_i
+hotel = Hotel.new(floors, main_corridors, sub_corridors)
 
 #Set the default stats of hotel floors.
-hotel.default_state(floors, main_cooridoors, sub_cooridoors)
+hotel.default_state
 
-puts "Any movement in cooridoor press 1 else 0"
-any_movement = STDIN.gets.chomp.to_i
-hotel.movement_in_cooridoor(any_movement)
-
+puts "Any movement in corridor press 1 else 0" 
+hotel.movement_in_corridor(STDIN.gets.chomp.to_i)
