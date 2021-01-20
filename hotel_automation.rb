@@ -4,7 +4,6 @@ class HotelAutomation
     @floors = floors
     @main_corridors = main_corridors
     @sub_corridors = sub_corridors
-    @total_power_consume = (main_corridors *15)+(sub_corridors *10)
   end
 
   def default_state
@@ -13,6 +12,10 @@ class HotelAutomation
       @hotel["floor#{floor}"] = set_corridors(@main_corridors, @sub_corridors)
     end
     hotel_status
+  end
+
+  def floor_power_consume
+    @total_power_consume_per_floor = (@main_corridors *15)+(@sub_corridors *10)
   end
 
   def set_corridors(main_corridors, sub_corridors)
@@ -84,7 +87,7 @@ class HotelAutomation
 
 
   def update_floor_status(floor, sub_corr)
-    puts "Total power consume #{@total_power_consume} units"
+    puts "Total power consume on floor#{floor} is #{@total_power_consume_per_floor} units"
     @hotel["floor#{floor}"]['sub_corridors'].each do |sub_corridor|
       sub_corridor["#{sub_corr}"][:light][:status] = "ON" unless sub_corridor["#{sub_corr}"].nil?
     end
@@ -96,7 +99,7 @@ class HotelAutomation
     end
     
     floor_power_consume = (@main_corridors*5) + (@main_corridors *10) + (sub_light_on*5) + (sub_ac_on*10)
-    if floor_power_consume > @total_power_consume
+    if floor_power_consume > @total_power_consume_per_floor
       @hotel["floor#{floor}"]['sub_corridors'].each_with_index do |sub_corridor, index|
         sub_corridor["#{index.to_i+1}"][:AC][:status] = "OFF" if  sub_corridor["#{index.to_i+1}"][:light][:status] == "OFF"
       end
@@ -116,6 +119,7 @@ hotel_automation = HotelAutomation.new(floors, main_corridors, sub_corridors)
 
 #Set the default stats of hotel floors.
 hotel_automation.default_state
+hotel_automation.floor_power_consume
 
 puts "Any movement in corridor press 1 else 0" 
 hotel_automation.movement_in_corridor(STDIN.gets.chomp.to_i)
