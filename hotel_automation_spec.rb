@@ -1,6 +1,5 @@
 require 'rspec'
 require './hotel_automation'
-require 'pry'
 
 
  DEFAULT_STATE = {"floor1"=> {"main_corridors"=>[{"1"=>{:light=>{:consume=>5, :status=>"ON"}, :AC=>{:consume=>10, :status=>"ON"}}}],
