@@ -1,20 +1,21 @@
 # Welcome to Hotel Automation
 
-#Program setup and execution commands
+# Program setup and execution commands
 
 1. Install ruby version 2.5.0
 
 2. Command to execute program
    ruby hotel_automation.rb
 
-# steps to execute test cases
+# Steps to execute test cases
   
-  1. gem install rspec
+  1. Install rspec liberary
+     gem install rspec
 
   2. Command to execute program
    rspec hotel_automation_spec.rb
 
-   test case will ask few inputs Please enter inputs
+   Test case will ask few inputs Please enter inputs
    
    Enter number of Floors:  1
    Enter Main corridors per floors: 1
