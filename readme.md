@@ -21,6 +21,6 @@
    - Enter number of Floors: - 1
    - Enter Main corridors per floors: - 1
    - Enter Sub corridors per floors: - 2
-   -Any movement in corridor press 1 else 0 - 0
+   - Any movement in corridor press 1 else 0 - 0
 
 
