@@ -4,14 +4,18 @@
 
 1. Install ruby version 2.5.0
 
-2. Command to execute program
+2. Run command
+   - gem install timeout
 
-  - ruby hotel_automation.rb
+3. Command to execute program
+
+  - ruby hotel_automation_solid.rb
 
 # Steps to execute test cases
   
   1. Install rspec liberary
     - gem install rspec
+    - gem install timeout
 
   2. Command to execute program
    	- rspec hotel_automation_spec.rb
